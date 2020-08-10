@@ -1,6 +1,6 @@
-// Copyright 2012 Olivier Gillet.
+// Copyright 2012 Emilie Gillet.
 //
-// Author: Olivier Gillet (ol.gillet@gmail.com)
+// Author: Emilie Gillet (emilie.o.gillet@gmail.com)
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -108,28 +108,29 @@ inline float SoftClip(float x) {
   }
 }
 
-  inline int32_t Clip16(int32_t x) {
-    if (x < -32768) {
-      return -32768;
-    } else if (x > 32767) {
-      return 32767;
-    } else {
-      return x;
-    }
+inline int32_t Clip16(int32_t x) {
+  if (x < -32768) {
+    return -32768;
+  } else if (x > 32767) {
+    return 32767;
+  } else {
+    return x;
   }
-  inline uint16_t ClipU16(int32_t x) {
-    if (x < 0) {
-      return 0;
-    } else if (x > 65535) {
-      return 65535;
-    } else {
-      return x;
-    }
+}
+inline uint16_t ClipU16(int32_t x) {
+  if (x < 0) {
+    return 0;
+  } else if (x > 65535) {
+    return 65535;
+  } else {
+    return x;
   }
+}
 
-  inline float Sqrt(float x) {
-    return sqrtf(x);
-  }
+inline float Sqrt(float x) {
+  return sqrtf(x);
+}
+
 
 inline int16_t SoftConvert(float x) {
   return Clip16(static_cast<int32_t>(SoftLimit(x * 0.5f) * 32768.0f));

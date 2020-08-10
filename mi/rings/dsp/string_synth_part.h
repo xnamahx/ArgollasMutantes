@@ -74,7 +74,7 @@ class StringSynthPart {
   StringSynthPart() { }
   ~StringSynthPart() { }
   
-  void Init(uint16_t* reverb_buffer);
+  void Init(/*uint16_t* reverb_buffer*/);
   
   void Process(
       const PerformanceState& performance_state,

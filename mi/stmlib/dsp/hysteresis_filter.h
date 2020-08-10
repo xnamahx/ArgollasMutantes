@@ -1,4 +1,4 @@
-// Copyright 2017 Emilie Gillet.
+// Copyright 2019 Emilie Gillet.
 //
 // Author: Emilie Gillet (emilie.o.gillet@gmail.com)
 //
@@ -24,48 +24,52 @@
 //
 // -----------------------------------------------------------------------------
 //
-// Gate bits are pre-processed to tag edges. A typical gate sequence is:
-//
-//           ------------
-//           
-// ----------            ----------
-//                                 
-// 00000000003111111111114000000000
-//  ^        ^   ^       ^
-//  |        |   |       |
-//  |        |   |      GATE_FLAG_FALLING
-//  |        |   |
-//  |        |  GATE_FLAG_HIGH
-//  |        |
-//  |       GATE_FLAG_HIGH | GATE_FLAG_RISING
-//  |
-// GATE_FLAG_LOW
+// Threshold type filter that filters out slow jumps of a value.
 
-#ifndef STMLIB_UTILS_GATE_FLAGS_H_
-#define STMLIB_UTILS_GATE_FLAGS_H_
+#ifndef STMLIB_DSP_HYSTERESIS_FILTER_H_
+#define STMLIB_DSP_HYSTERESIS_FILTER_H_
 
 #include "stmlib/stmlib.h"
 
 namespace stmlib {
 
-enum GateFlagsBits {
-  GATE_FLAG_LOW = 0,
-  GATE_FLAG_HIGH = 1,
-  GATE_FLAG_RISING = 2,
-  GATE_FLAG_FALLING = 4,
-};
+class HysteresisFilter {
+ public:
+  HysteresisFilter() { }
+  ~HysteresisFilter() { }
 
-typedef uint8_t GateFlags;
-
-inline GateFlags ExtractGateFlags(GateFlags previous, bool current) {
-  previous &= GATE_FLAG_HIGH;
-  if (current) {
-    return previous ? GATE_FLAG_HIGH : (GATE_FLAG_RISING | GATE_FLAG_HIGH);
-  } else {
-    return previous ? GATE_FLAG_FALLING : GATE_FLAG_LOW;
+  void Init(float threshold) {
+    value_ = 0.0f;
+    threshold_ = threshold;
   }
-}
+  
+  inline float Process(float value) {
+    return Process(value, threshold_);
+  }
+
+  inline float Process(float value, float threshold) {
+    if (threshold == 0.0f) {
+      value_ = value;
+    } else {
+      float error = value - value_;
+      if (error > threshold) {
+        value_ = value - threshold;
+      } else if (error < -threshold) {
+        value_ = value + threshold;
+      }
+    }
+    return value_;
+  }
+
+  inline float value() const { return value_; }
+
+ private:
+  float value_;
+  float threshold_;
+
+  DISALLOW_COPY_AND_ASSIGN(HysteresisFilter);
+};
 
 }  // namespace stmlib
 
-#endif  // STMLIB_UTILS_GATE_FLAGS_H_
+#endif  // STMLIB_DSP_HYSTERESIS_FILTER_H_
