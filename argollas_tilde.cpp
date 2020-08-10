@@ -30,55 +30,6 @@ inline int clamp(int x, int a, int b) {
 inline short TO_SHORTFRAME(float v) { return (short(v * 16384.0f)); }
 inline float FROM_SHORTFRAME(short v) { return (float(v) / 16384.0f); }
 
-struct SchmittTrigger {
-	enum State {
-		UNKNOWN,
-		LOW,
-		HIGH
-	};
-	State state;
-
-	SchmittTrigger() {
-		reset();
-	}
-	void reset() {
-		state = UNKNOWN;
-	}
-	/** Updates the state of the Schmitt Trigger given a value.
-	Returns true if triggered, i.e. the value increases from 0 to 1.
-	If different trigger thresholds are needed, use
-		process(rescale(in, low, high, 0.f, 1.f))
-	for example.
-	*/
-	bool process(float in) {
-		switch (state) {
-			case LOW:
-				if (in >= 1.f) {
-					state = HIGH;
-					return true;
-				}
-				break;
-			case HIGH:
-				if (in <= 0.f) {
-					state = LOW;
-				}
-				break;
-			default:
-				if (in >= 1.f) {
-					state = HIGH;
-				}
-				else if (in <= 0.f) {
-					state = LOW;
-				}
-				break;
-		}
-		return false;
-	}
-	bool isHigh() {
-		return state == HIGH;
-	}
-};
-
 struct t_argollas {
 	t_pxobject x_obj;
 	//enum ParamIds {
@@ -97,7 +48,7 @@ struct t_argollas {
 	double param_structure_mod;
 	double param_position_mod;
 
-	uint16_t reverb_buffer[32768] = {};
+	//uint16_t reverb_buffer[32768] = {};
 	rings::Part part;
 	rings::StringSynthPart string_synth;
 	rings::Strummer strummer;
@@ -106,8 +57,6 @@ struct t_argollas {
 	bool strum = false;
 	bool lastStrum = false;
 
-	SchmittTrigger polyphonyTrigger;
-	SchmittTrigger modelTrigger;
 	int polyphonyMode = 0;
 	rings::ResonatorModel model = rings::RESONATOR_MODEL_MODAL;
 	bool easterEgg = false;
@@ -135,8 +84,8 @@ void t_argollas::init() {
 	memset(&string_synth, 0, sizeof(string_synth));
 
 	strummer.Init(0.01, sr / 24);
-	part.Init(reverb_buffer);
-	string_synth.Init(reverb_buffer);
+	/*part.Init(reverb_buffer);
+	string_synth.Init(reverb_buffer);*/
 
 }
 
@@ -185,7 +134,7 @@ void* argollas_new(void) {
 	outlet_new(self, "signal");
 	inlet_new(self, NULL);
 
-	self->x_obj.z_misc = Z_NO_INPLACE;
+	//self->x_obj.z_misc = Z_NO_INPLACE;
 	self->init();
 
 	return (void *)self;
@@ -193,29 +142,26 @@ void* argollas_new(void) {
 
 
 void argollas_perform64(t_argollas* self, t_object* dsp64, double** ins, long numins, double** outs, long numouts, long sampleframes, long flags, void* userparam) {
-	    double    *in = ins[0];     // first inlet
-	    //float    *in2 = ins[1];     // first inlet
-	    double    *out = outs[0];   // first outlet
-	    double    *out2 = outs[1];   // first outlet
+    double    *in = ins[0];     // first inlet
+    //float    *in2 = ins[1];     // first inlet
+    double    *out = outs[0];   // first outlet
+    double    *out2 = outs[1];   // first outlet
 
-		if (self->sf!=sampleframes){
-			self->sf=sampleframes;
-			self->changeRate();
-		}
+	if (self->sf!=sampleframes){
+		self->sf=sampleframes;
+		self->changeRate();
+	}
 
-		for (int i=0; i<sampleframes; ++i){
-			self->ibuf[i] = *in++;
-		}
+	for (int i=0; i<sampleframes; ++i){
+		self->ibuf[i] = *in++;
+	}
 
-		self->step();
+	self->step();
 
-		for (int i = 0; i < sampleframes; i++) {
-			*out++ = self->outbuf[i];
-			*out2++ = self->auxbuf[i];
-		}
-
-
-
+	for (int i = 0; i < sampleframes; i++) {
+		*out++ = self->outbuf[i];
+		*out2++ = self->auxbuf[i];
+	}
 
 }
 

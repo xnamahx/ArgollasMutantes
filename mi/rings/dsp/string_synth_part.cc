@@ -35,7 +35,7 @@ namespace rings {
 using namespace std;
 using namespace stmlib;
 
-void StringSynthPart::Init(uint16_t* reverb_buffer) {
+void StringSynthPart::Init(/*uint16_t* reverb_buffer*/) {
   active_group_ = 0;
   acquisition_delay_ = 0;
   
@@ -57,9 +57,9 @@ void StringSynthPart::Init(uint16_t* reverb_buffer) {
   
   limiter_.Init();
   
-  reverb_.Init(reverb_buffer);
+  /*reverb_.Init(reverb_buffer);
   chorus_.Init(reverb_buffer);
-  ensemble_.Init(reverb_buffer);
+  ensemble_.Init(reverb_buffer);*/
   
   note_filter_.Init(
       kSampleRate / kMaxBlockSize,
@@ -387,7 +387,7 @@ void StringSynthPart::Process(
   }
   
   if (clear_fx_) {
-    reverb_.Clear();
+    //reverb_.Clear();
     clear_fx_ = false;
   }
   
@@ -415,7 +415,7 @@ void StringSynthPart::Process(
       ensemble_.Process(out, aux, size);
       break;
   
-    case FX_REVERB:
+    /*case FX_REVERB:
     case FX_REVERB_2:
       reverb_.set_amount(patch.position * 0.5f);
       reverb_.set_diffusion(0.625f);
@@ -425,7 +425,7 @@ void StringSynthPart::Process(
       reverb_.set_input_gain(0.2f);
       reverb_.set_lp(fx_type_ == FX_REVERB ? 0.3f : 0.6f);
       reverb_.Process(out, aux, size);
-      break;
+      break;*/
     
     default:
       break;

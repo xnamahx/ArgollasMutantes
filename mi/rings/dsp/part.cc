@@ -37,7 +37,7 @@ namespace rings {
 using namespace std;
 using namespace stmlib;
 
-void Part::Init(uint16_t* reverb_buffer) {
+void Part::Init(/*uint16_t* reverb_buffer*/) {
   active_voice_ = 0;
   
   fill(&note_[0], &note_[kMaxPolyphony], 0.0f);
@@ -53,7 +53,7 @@ void Part::Init(uint16_t* reverb_buffer) {
     dc_blocker_[i].Init(1.0f - 10.0f / kSampleRate);
   }
   
-  reverb_.Init(reverb_buffer);
+  //reverb_.Init(reverb_buffer);
   limiter_.Init();
 
   note_filter_.Init(
